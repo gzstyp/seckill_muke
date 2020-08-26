@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fwtai.dao.SequenceDOMapper">
+
+    <resultMap id="BaseResultMap" type="com.fwtai.dataobject.SequenceDO">
+        <id column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="current_value" jdbcType="BIGINT" property="currentValue"/>
+        <result column="step" jdbcType="TINYINT" property="step"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+      name, current_value, step
+    </sql>
+
+    <select id="getStepByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sequence_info
+        where name = #{name,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sequence_info
+        where name = #{name,jdbcType=VARCHAR} FOR UPDATE <!-- 表上锁,保证唯一 -->
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from sequence_info
+        where name = #{name,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.fwtai.dataobject.SequenceDO">
+        insert into sequence_info (name, current_value, step
+          )
+        values (#{name,jdbcType=VARCHAR}, #{currentValue,jdbcType=BIGINT}, #{step,jdbcType=TINYINT}
+          )
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.fwtai.dataobject.SequenceDO">
+        insert into sequence_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                name,
+            </if>
+            <if test="currentValue != null">
+                current_value,
+            </if>
+            <if test="step != null">
+                step,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="currentValue != null">
+                #{currentValue,jdbcType=BIGINT},
+            </if>
+            <if test="step != null">
+                #{step,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.fwtai.dataobject.SequenceDO">
+        update sequence_info
+        <set>
+            <if test="currentValue != null">
+                current_value = #{currentValue,jdbcType=BIGINT},
+            </if>
+            <if test="step != null">
+                step = #{step,jdbcType=TINYINT},
+            </if>
+        </set>
+        where name = #{name,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.fwtai.dataobject.SequenceDO">
+        update sequence_info
+        set current_value = #{currentValue,jdbcType=BIGINT},
+          step = #{step,jdbcType=TINYINT}
+        where name = #{name,jdbcType=VARCHAR}
+    </update>
+</mapper>
